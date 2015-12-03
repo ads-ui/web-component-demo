@@ -6,3 +6,5 @@ lib/
 dist/
 .babel-cache/
 .coverage/
+src/nsName.js
+styles/ns-name.scss

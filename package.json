@@ -55,13 +55,20 @@
     "karma-webpack": "^1.7.0",
     "mocha": "^2.3.3",
     "node-sass": "^3.3.3",
+    "ns-gen": "^0.4.0",
     "sass-loader": "^3.1.1",
     "semver": "^5.0.3",
     "sinon": "^1.17.1",
     "sinon-chai": "^2.8.0",
     "style-loader": "^0.13.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.0",
     "yargs": "^3.27.0"
+  },
+  "dependencies": {
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3"
   }
 }

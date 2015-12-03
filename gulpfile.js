@@ -6,6 +6,9 @@ var eslint = require('gulp-eslint');
 var path = require('path');
 var childProcess = require('child_process');
 var del = require('del');
+var source = require('vinyl-source-stream');
+var vinylBuffer = require('vinyl-buffer');
+var nsGen = require('ns-gen');
 
 require('babel/register');
 
@@ -32,7 +35,23 @@ function runNpmCmd(cmdName, args, options, callback) {
   cp.on('error', function(err) { callback && callback(err); });
 }
 
-gulp.task('build-babel', function() {
+gulp.task('generate-ns:js', () => {
+  var stream = source('nsName.js');
+  stream.write(nsGen.generateJsFile());
+  stream.end();
+  return stream.pipe(vinylBuffer()).pipe(gulp.dest('src/'));
+});
+
+gulp.task('generate-ns:sass', () => {
+  var stream = source('ns-name.scss');
+  stream.write(nsGen.generateSassFile('css-ns'));
+  stream.end();
+  return stream.pipe(vinylBuffer()).pipe(gulp.dest('styles/'));
+});
+
+gulp.task('generate-ns', ['generate-ns:js', 'generate-ns:sass'])
+
+gulp.task('build-babel', ['generate-ns'], function() {
   var fs = require('fs');
   var config = JSON.parse(fs.readFileSync('./.babelrc'));
   return gulp.src('src/**/*.js')
@@ -40,7 +59,7 @@ gulp.task('build-babel', function() {
     .pipe(gulp.dest('lib/'));
 });
 
-gulp.task('build-sass', function() {
+gulp.task('build-sass', ['generate-ns'], function() {
   return gulp.src('styles/**/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('./dist/'));
@@ -48,11 +67,11 @@ gulp.task('build-sass', function() {
 
 gulp.task('build', ['build-babel', 'build-sass']);
 
-gulp.task('webpack:build-minimize', function(callback) {
+gulp.task('webpack:build-minimize', ['generate-ns'], function(callback) {
   runNpmCmd('webpack', ['-p'], callback);
 });
 
-gulp.task('webpack:build', function(callback) {
+gulp.task('webpack:build', ['generate-ns'], function(callback) {
   runNpmCmd('webpack', callback);
 });
 
@@ -65,16 +84,16 @@ gulp.task('lint', function() {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('test', function(callback) {
+gulp.task('test', ['generate-ns'], function(callback) {
   runNpmCmd('karma', ['start', '--single-run'], callback);
 });
 
-gulp.task('test-coverage', function(callback) {
+gulp.task('test-coverage', ['generate-ns'], function(callback) {
   var options = {env: {'COVERAGE': true}};
   runNpmCmd('karma', ['start', '--single-run'], options, callback);
 });
 
-gulp.task('test-watch', function(callback) {
+gulp.task('test-watch', ['generate-ns'], function(callback) {
   runNpmCmd('karma', ['start'], callback);
 });
 

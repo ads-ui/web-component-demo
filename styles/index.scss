@@ -1,3 +1,7 @@
-.start-kit {
-  color: blue;
+@import "ns-name";
+
+.#{$css-ns} {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
 }
